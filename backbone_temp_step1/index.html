@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Untitled</title>
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/normalize/3.0.1/normalize.min.css">
+  </head>
+  <body>
+    <ul id="band-wrapper"></ul>
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore-min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/0.9.9/backbone-min.js"></script>
+    <script>
+    var Band = {};
+
+    Band.Member = Backbone.Model.extend({});
+
+    Band.Members = Backbone.Collection.extend({
+      model: Band.Member
+    });
+
+    var band = new Band.Members([
+      { name: 'John' },
+      { name: 'Paul' },
+      { name: 'George' },
+      { name: 'Bingo' }
+    ]);
+
+    // View for each model (In this case band member)
+    Band.Member.View = Backbone.View.extend({
+      tagname: "li",
+      render: function(){
+        this.$el.text(this.model.get("name"));
+
+        this.parentView.$el.append(this.$el);
+
+        return this;
+      }
+    });
+
+
+    // View for collection of all models (therefore individual views)
+    Band.Members.View = Backbone.View.extend({
+      el: '#band-wrapper',
+      initialize: function() {
+        this.render();
+      },
+      render: function() {
+        this.$el.empty();
+        var thisView = this;
+        this.collection.each(function(bandMember) {
+          var bandMemberView = new Band.Member.View({
+            model: bandMember
+          });
+
+          bandMemberView.parentView = thisView;
+
+          bandMemberView.render();
+        });
+
+        return this;
+      }
+    });
+
+    var bandView = new Band.Members.View({
+      collection: band
+    });
+
+    </script>
+
+  </body>
+</html>
